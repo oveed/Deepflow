@@ -10,8 +10,8 @@ const MainSection = () => {
             {/* Content before waves */}
             <div className="inner-header flex">
 
-                <h1 style={{marginBottom: "5rem "}}>Simple CSS Waves</h1>
-                
+                <h1 style={{ marginBottom: "5rem " }}>Smart Firma</h1>
+
             </div>
 
             <div style={{
