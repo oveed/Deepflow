@@ -4,13 +4,18 @@ import "./PlantSection.css"
 import axios from 'axios';
 
 export default function PlantSection() {
+    const [file, setFile] = useState(null);
+    const [result, setResult] = useState(null);
+
     const [previewImage, setPreviewImage] = useState(null);
     const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setPreviewImage(URL.createObjectURL(file));
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);  // Save the file in state
+            setPreviewImage(URL.createObjectURL(selectedFile));
         }
     };
+
     const handleSubmit = async () => {
         if (!file) return;
 
@@ -18,14 +23,14 @@ export default function PlantSection() {
         formData.append('image', file);
 
         try {
-            const response = await axios.post('https://api.apptap.tn/predict_plant_disease', formData, {
+            const response = await axios.post('http://192.168.212.253:5000/predict_plant_disease', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             console.log(response.data); // Print the result
         } catch (error) {
-            console.error('Error uploading the image:', error);
+            console.error('Error response:', error.response ? error.response.data : error.message);
         }
     };
 
@@ -56,6 +61,12 @@ export default function PlantSection() {
                             className="image-preview"
                             width={'100px'}
                         />
+                    )}
+                    {result && (
+                        <div className="result">
+                            <h3>Result:</h3>
+                            <p>{result}</p>
+                        </div>
                     )}
                     <button className="submit-btn" onClick={handleSubmit}>
                         Submit
