@@ -17,22 +17,33 @@ export default function PlantSection() {
     };
 
     const handleSubmit = async () => {
+        setResult(null); // Reset result before new request
         if (!file) return;
-
+    
         const formData = new FormData();
-        formData.append('image', file);
-
+        formData.append('file', file); // Ensure the key matches your backend expectation
+    
         try {
             const response = await axios.post('http://192.168.212.253:5000/predict_plant_disease', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log(response.data); // Print the result
+    
+            console.log('Response data:', response.data); // Log the response for debugging
+    
+            // Check if the response contains the expected values and set accordingly
+            if (response.data.prediction) {
+                setResult([response.data.prediction]); // Wrap the prediction in an array
+            } else {
+                setResult(['Unexpected response format']); // Handle unexpected response
+            }
         } catch (error) {
             console.error('Error response:', error.response ? error.response.data : error.message);
+            setResult(['Error fetching result']); // Handle errors
         }
     };
+    
 
     return (
         <section className='plant-section section ' id='1'>
@@ -65,8 +76,7 @@ export default function PlantSection() {
                     {result && (
                         <div className="result">
                             <h3>Result:</h3>
-                            <p>{result}</p>
-                        </div>
+                            <p>{result.join(', ')}</p>                           </div>
                     )}
                     <button className="submit-btn" onClick={handleSubmit}>
                         Submit

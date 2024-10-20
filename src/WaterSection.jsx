@@ -1,20 +1,64 @@
 import React, { useState } from 'react';
 import './WaterSection.css';
-import { Grid, InputAdornment, TextField, Button, ThemeProvider, createTheme, Input } from '@mui/material';
-import { Unstable_NumberInput as NumberInput } from '@mui/base/Unstable_NumberInput';
-import QuantityInput from './NumberInput';
-
-
+import { Input, ThemeProvider, createTheme } from '@mui/material';
+import axios from 'axios';
 
 const droplets = 250;
 
-
 const WaterSection = () => {
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState({
+        day1: 0.0,
+        day2: 0.0,
+        day3: 0.0,
+        day4: 0.0,
+        day5: 0.0, 
+        day6: 1.4,
+        day7: 2.0,
+    });
+    const [result, setResult] = useState(null);
 
     const handleQuantityChange = (event) => {
-        setQuantity(event.target.value);
+        const { name, value } = event.target;
+        setQuantity((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
+
+    const handleSubmit = async () => {
+        setResult(null); // Reset result before new request
+        try {
+            const response = await axios.post('http://192.168.212.253:5000/predict_weather', {
+                data: Object.values(quantity).map(Number), // Ensure it sends an array
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log('Response data:', response.data); // Log the response for debugging
+
+            // Check if the response contains predicted_values and set it accordingly
+            if (response.data.predicted_values) {
+                setResult(response.data.predicted_values); // Set only the predicted values
+            } else {
+                setResult('Unexpected response format'); // Handle unexpected response
+            }
+        } catch (error) {
+            console.error('Error response:', error.response ? error.response.data : error.message);
+            setResult('Error fetching result'); // Handle errors
+        }
+    };
+
+
+
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: '#1976d2',
+            },
+        },
+    });
+
     const rainDrops = Array.from({ length: droplets }).map((_, r) => {
         const x = Math.floor(Math.random() * 100);
         const y = Math.floor(Math.random() * 100);
@@ -46,197 +90,41 @@ const WaterSection = () => {
         );
     });
 
-    const theme = createTheme({
-        palette: {
-            primary: {
-                main: '#1976d2', // Adjust this color to your preference
-            },
-        },
-    });
-
     return (
         <ThemeProvider theme={theme}>
             <section className="water-section section" id='2'>
                 {rainDrops}
-                <div
-                    className="card-element"
-                    style={{
-                        zIndex: '10',
-                    }}
-                >
-                    {/* <form>
-                        <TextField
-                            label="Title"
-                            name="title"
-                            variant="outlined"
-                            required
-                            fullWidth
-                        />
-                        <TextField
-                            label="Teaser"
-                            name="teaser"
-                            variant="outlined"
-                            multiline
-                            required
-                            fullWidth
-                        />
-                        <Button type="submit" variant="contained" color="primary">
-                            Submit
-                        </Button>
-
-                    </form> */}
-                    {/* <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <label htmlFor="quantity" style={{ fontWeight: 'bold' }}>Quantity:</label>
-                        <QuantityInput
-                            id="quantity" // associate the label with the input
-                            aria-label="Quantity"
-                            value={quantity}
-                            onChange={handleQuantityChange}
-                            // value={quantity}
-                            // onChange={handleQuantityChange}
-                            min={1}
-                            max={99}
-                            step={0.1}
-                        />
-                    </div> */}
-                    <h3 style={{marginTop: '120px'}}>Enter recent rain percipitation <br />values:</h3>
-                    <div className="d-flex" style={{display: 'flex',alignItems: "center", justifyContent: 'center', flexDirection:'column'}}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '7px', flexDirection:'column' }}>
-                        
-
-<span><label htmlFor="quantity" style={{ fontWeight: 'bold' }}>Day1:</label>
-                        <Input
-
-                            type="number"
-                            style={{
-                                backgroundColor: 'white',
-                                padding: '5px 10px',
-                                margin: '5px 7px',
-                                borderRadius: '15px',
-
-                            }}
-                            disableUnderline
-                            defaultValue={0.0}
-                            slotProps={{
-                                input: {
-                                    min: 1,
-                                    max: 5,
-                                    step: 0.1,
-                                },
-                            }}
-                        /></span>
-
-<span><label htmlFor="quantity" style={{ fontWeight: 'bold' }}>Day2:</label>
-                        <Input
-
-                            type="number"
-                            style={{
-                                backgroundColor: 'white',
-                                padding: '5px 10px',
-                                margin: '3px 7px',
-                                borderRadius: '15px',
-
-                            }}
-                            disableUnderline
-                            defaultValue={0}
-                            slotProps={{
-                                input: {
-                                    min: 1,
-                                    max: 5,
-                                    step: 0.1,
-                                },
-                            }}
-                        /></span>
-<span>
-<label htmlFor="quantity" style={{ fontWeight: 'bold' }}>Day3:</label>
-                        <Input
-
-                            type="number"
-                            style={{
-                                backgroundColor: 'white',
-                                padding: '5px 10px',
-                                margin: '3px 7px',
-                                borderRadius: '15px',
-
-                            }}
-                            disableUnderline
-                            defaultValue={0}
-                            slotProps={{
-                                input: {
-                                    min: 1,
-                                    max: 5,
-                                    step: 0.1,
-                                },
-                            }}
-                        /></span>
-
-<span><label htmlFor="quantity" style={{ fontWeight: 'bold' }}>Day4:</label>
-                        <Input
-
-                            type="number"
-                            style={{
-                                backgroundColor: 'white',
-                                padding: '5px 10px',
-                                margin: '3px 7px',
-                                borderRadius: '15px',
-
-                            }}
-                            disableUnderline
-                            defaultValue={0}
-                            slotProps={{
-                                input: {
-                                    min: 1,
-                                    max: 5,
-                                    step: 0.1,
-                                },
-                            }}
-                        />
-</span>
-<span><label htmlFor="quantity" style={{ fontWeight: 'bold' }}>Day5:</label>
-                        <Input
-
-                            type="number"
-                            style={{
-                                backgroundColor: 'white',
-                                padding: '5px 10px',
-                                margin: '3px 7px',
-                                borderRadius: '15px',
-
-                            }}
-                            disableUnderline
-                            defaultValue={1.4}
-                            slotProps={{
-                                input: {
-                                    min: 1,
-                                    max: 5,
-                                    step: 0.1,
-                                },
-                            }}
-                        /></span>
-
-<span><label htmlFor="quantity" style={{ fontWeight: 'bold' }}>Day6:</label>
-                        <Input
-
-                            type="number"
-                            style={{
-                                backgroundColor: 'white',
-                                padding: '5px 10px',
-                                margin: '3px 7px',
-                                borderRadius: '15px',
-
-                            }}
-                            disableUnderline
-                            defaultValue={2.0}
-                            slotProps={{
-                                input: {
-                                    min: 1,
-                                    max: 5,
-                                    step: 0.1,
-                                },
-                            }}
-                        /></span>
-                        <button>Submit</button>
-                    </div>
+                <div className="card-element" style={{ zIndex: '10' }}>
+                    <h3 style={{ marginTop: '120px' }}>Enter recent rain precipitation values:</h3>
+                    <div className="d-flex" style={{ display: 'flex', alignItems: "center", justifyContent: 'center', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', flexDirection: 'column' }}>
+                            {['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'].map((day, index) => (
+                                <span key={day}>
+                                    <label htmlFor={day} style={{ fontWeight: 'bold' }}>Day {index + 1}:</label>
+                                    <Input
+                                        name={day}
+                                        type="number"
+                                        style={{
+                                            backgroundColor: 'white',
+                                            padding: '5px 10px',
+                                            margin: '5px 7px',
+                                            borderRadius: '15px',
+                                        }}
+                                        disableUnderline
+                                        value={quantity[day]}
+                                        onChange={handleQuantityChange}
+                                        min={0}
+                                        step={0.1}
+                                    />
+                                </span>
+                            ))}
+                        </div>
+                        {result && (
+                            <div className="result">
+                                <h3>Result:</h3>
+                                <p>{result.join(', ')}</p>                            </div>
+                        )}
+                        <button className="submit-btn" onClick={handleSubmit}>Submit</button>
 
                     </div>
                 </div>
