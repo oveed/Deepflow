@@ -95,7 +95,7 @@ const WaterSection = () => {
             <section className="water-section section" id='2'>
                 {rainDrops}
                 <div className="card-element" style={{ zIndex: '10' }}>
-                    <h3 style={{ marginTop: '120px' }}>Enter recent rain precipitation values:</h3>
+                    <h3 style={{ margin: '170px 15px 10px 15px' }}>Enter recent rain precipitation values:</h3>
                     <div className="d-flex" style={{ display: 'flex', alignItems: "center", justifyContent: 'center', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '7px', flexDirection: 'column' }}>
                             {['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'].map((day, index) => (
