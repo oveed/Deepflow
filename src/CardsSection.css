@@ -1,0 +1,18 @@
+.cards-section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+
+@media (max-width: 768px) {
+    .cards-container{
+        flex-direction: column;
+        margin-top: 50px;
+        margin-bottom: 150px;
+    }
+    
+
+    }
